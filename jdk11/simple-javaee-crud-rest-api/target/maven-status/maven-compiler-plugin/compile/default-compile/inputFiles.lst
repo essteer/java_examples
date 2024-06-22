@@ -1,0 +1,4 @@
+/home/essteer/projects/java_examples/simple-javaee-crud-rest-api/src/main/java/com/kodnito/restapi/resources/TodoResource.java
+/home/essteer/projects/java_examples/simple-javaee-crud-rest-api/src/main/java/com/kodnito/restapi/models/Todo.java
+/home/essteer/projects/java_examples/simple-javaee-crud-rest-api/src/main/java/com/kodnito/restapi/resources/ApplicationConfig.java
+/home/essteer/projects/java_examples/simple-javaee-crud-rest-api/src/main/java/com/kodnito/restapi/dao/TodoDAO.java
