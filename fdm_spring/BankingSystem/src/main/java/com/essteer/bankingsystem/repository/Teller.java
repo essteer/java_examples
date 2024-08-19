@@ -1,8 +1,6 @@
 package com.essteer.bankingsystem.repository;
 
 import java.math.BigDecimal;
-import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.context.annotation.Scope;
@@ -24,15 +22,11 @@ public class Teller {
     }
 
     public User createUser(User user) {
-        Map<Long, User> users = this.userRepo.getUsers();
-        users.put(user.getUserId(), user);
-        return user;
+        return userRepo.save(user);
     }
 
     public Account createAccount(Account account) {
-        Map<Long, Account> accounts = this.accountRepo.getAccounts();
-        accounts.put(account.getAccountNumber(), account);
-        return account;
+        return accountRepo.save(account);
     }
 
     public User createAccountAndUser(User user, Account account) {
@@ -42,13 +36,11 @@ public class Teller {
     }
 
     public Optional<User> findUser(Long userId) {
-        Map<Long, User> users = this.userRepo.getUsers();
-        return Optional.ofNullable(users.get(userId));
+        return userRepo.findById(userId);
     }
 
     public Optional<Account> findAccount(Long accountNumber) {
-        Map<Long, Account> accounts = this.accountRepo.getAccounts();
-        return Optional.ofNullable(accounts.get(accountNumber));
+        return accountRepo.findById(accountNumber);
     }
 
     public User updateUser(User user) {
@@ -62,57 +54,35 @@ public class Teller {
     }
 
     public void depositInAccount(Long accountNumber, BigDecimal amount) {
-        Account account = accountRepo.findById(accountNumber).orElse(null);
-        if (account != null) {
-            BigDecimal balance = account.getBalance();
-            BigDecimal newBalance = balance.add(amount);
-            account.setBalance(newBalance);
+        accountRepo.findById(accountNumber).ifPresent(account -> {
+            account.setBalance(account.getBalance().add(amount));
             accountRepo.save(account);
-        }
-
+        });
     }
 
     public void withdrawFromAccount(Long accountNumber, BigDecimal amount) {
-        Account account = accountRepo.findById(accountNumber).orElse(null);
-        if (account != null) {
+        accountRepo.findById(accountNumber).ifPresent(account -> {
             BigDecimal balance = account.getBalance();
-            if (amount.compareTo(balance) >= 0) {
-                BigDecimal newBalance = balance.subtract(amount);
-                account.setBalance(newBalance);
+            if (balance.compareTo(amount) >= 0) {
+                account.setBalance(balance.subtract(amount));
                 accountRepo.save(account);
             }
-        }
+        });
     }
 
     public void deleteUser(Long userId) {
-        if (userRepo.existsById(userId)) {
-            User user = userRepo.findById(userId).orElse(null);
-            if (user != null) {
-                List<Account> userAccounts = accountRepo.findByUser(user);
-                for (Account account : userAccounts) {
-                    accountRepo.deleteById(account.getAccountNumber());
-                }
-            }
+        userRepo.findById(userId).ifPresent(user -> {
+            accountRepo.findByUser(user).forEach(account -> accountRepo.deleteById(account.getAccountNumber()));
             userRepo.deleteById(userId);
-        }
+        });
     }
 
     public void deleteAccount(Long accountNumber) {
-        if (accountRepo.existsById(accountNumber)) {
-            Account account = accountRepo.findById(accountNumber).orElse(null);
-            if (account != null) {
-                User accountOwner = account.getOwner();
-                List<Account> ownerAccounts = accountOwner.getAccounts();
-                for (Account ac : ownerAccounts) {
-                    if (ac.getAccountNumber() == accountNumber) {
-                        ownerAccounts.remove(ac);
-                        accountOwner.setAccounts(ownerAccounts);
-                        break;
-                    }
-                }
-            }
+        accountRepo.findById(accountNumber).ifPresent(account -> {
+            User accountOwner = account.getOwner();
+            accountOwner.getAccounts().removeIf(ac -> ac.getAccountNumber() == accountNumber);
             accountRepo.deleteById(accountNumber);
-        }
+        });
     }
 
     public UserMapRepository getUserRepo() {

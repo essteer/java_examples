@@ -1,6 +1,7 @@
 package com.essteer.bankingsystem.repository;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -20,9 +21,13 @@ public class AccountMapRepository implements AccountRepository<Account, Long> {
 
     public AccountMapRepository() {
         super();
+        this.accounts = new HashMap<>();
     }
 
     public AccountMapRepository(Map<Long, Account> accounts) {
+        if (accounts == null) {
+            throw new IllegalArgumentException("Accounts map cannot be null");
+        }
         this.accounts = accounts;
     }
 
@@ -38,7 +43,7 @@ public class AccountMapRepository implements AccountRepository<Account, Long> {
     public List<Account> findByUser(User user) {
         List<Account> userAccounts = new ArrayList<>();
         for (Entry<Long, Account> entry : accounts.entrySet()) {
-            if (((com.essteer.bankingsystem.model.Account) entry.getValue()).getOwner().equals(user)) {
+            if ((entry.getValue()).getOwner().equals(user)) {
                 userAccounts.add(entry.getValue());
             }
         }
@@ -46,11 +51,7 @@ public class AccountMapRepository implements AccountRepository<Account, Long> {
     }
 
     public List<Account> findAll() {
-        List<Account> allAccounts = new ArrayList<>();
-        for (Entry<Long, Account> entry : accounts.entrySet()) {
-            allAccounts.add(entry.getValue());
-        }
-        return allAccounts;
+        return new ArrayList<>(accounts.values());
     }
 
     public boolean existsById(Long id) {
