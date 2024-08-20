@@ -1,10 +1,10 @@
 package com.essteer.contactdirectory.model;
 
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
+// import org.springframework.context.annotation.Scope;
+// import org.springframework.stereotype.Component;
 
-@Component  // alternative to using @Bean in main method (in ContactDirectoryApplication.java)
-@Scope("prototype")  // default is singleton, changing enables multiple instances to be obtained
+// @Component  // alternative to using @Bean in main method (in ContactDirectoryApplication.java)
+// @Scope("prototype")  // default is singleton, changing enables multiple instances to be obtained
 public class Address {
 
     private String city;
